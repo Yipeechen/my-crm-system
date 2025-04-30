@@ -1,10 +1,12 @@
+import { Resolvers } from '@apollo/client';
+
 import SourceAPI from '../graphql/dataSource/api'
 
 const sourceAPI = new SourceAPI()
 
-export const resolvers = {
+export const resolvers: Resolvers = {
   Query: {
-    policyholder: async (_, { code }) => {
+    policyholder: async (_, { code }: { code: string }) => {
       return await sourceAPI.getPolicyholderDetail(code)
     },
   },

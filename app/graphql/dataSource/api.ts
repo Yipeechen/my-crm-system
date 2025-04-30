@@ -1,9 +1,19 @@
+const MAX_DEPTH = 3;
+
+type Node = {
+  code: string;
+  name: string;
+  registration_date: string;
+  introducer_code: string | null;
+  l?: Node[];
+  r?: Node[];
+}
 export default class SourceAPI {
 
   API_URL = process.env.API_URL as string;
   X_API_KEY = process.env.X_API_KEY as string;
 
-  async getPolicyholderDetail (code: string) {
+  async fetchNode(code: string): Promise<Node> {
     const uri = `${this.API_URL}/api/policyholders`
     const result = await fetch(`${uri}?code=${code}`, {
       method: 'GET',
@@ -12,7 +22,29 @@ export default class SourceAPI {
       }
     }).then(res => res.json())
 
-    return [result]
+    return result;
+  }
+
+  async getPolicyholderDetail(code: string, depth: number = 1): Promise<Node> {
+    const node = await this.fetchNode(code);
+
+    if (depth >= MAX_DEPTH) return node;
+
+    if (Array.isArray(node.l)) {
+      const expandedL = await Promise.all(
+        node.l.map(child => this.getPolicyholderDetail(child.code, depth + 1))
+      );
+      node.l = expandedL;
+    }
+
+    if (Array.isArray(node.r)) {
+      const expandedR = await Promise.all(
+        node.r.map(child => this.getPolicyholderDetail(child.code, depth + 1))
+      );
+      node.r = expandedR;
+    }
+
+    return node;
   }
 
 }

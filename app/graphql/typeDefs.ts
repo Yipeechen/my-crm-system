@@ -6,12 +6,12 @@ const typeDefs = gql`
     name: String!
     registration_date: String!
     introducer_code: String
-    l: Policyholder
-    r: Policyholder
+    l: [Policyholder]
+    r: [Policyholder]
   }
 
   type Query {
-    policyholder (code: String): [Policyholder!]!
+    policyholder (code: String): Policyholder!
   }
 
   type Mutation {
