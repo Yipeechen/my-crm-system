@@ -1,16 +1,30 @@
 import { ApolloServer } from '@apollo/server';
 import { startServerAndCreateNextHandler } from '@as-integrations/next';
+import { NextRequest } from 'next/server';
+
 import typeDefs from '../../graphql/typeDefs';
 import { resolvers } from '../../graphql/resolvers';
 
 const apolloServer = new ApolloServer({ typeDefs, resolvers });
 
-export const config = {
-  api: {
-    bodyParser: false
+const createHandler = async () => {
+  return startServerAndCreateNextHandler(apolloServer, {
+    context: async (req) => ({ req }),
+  });
+};
+
+let handler: ReturnType<typeof startServerAndCreateNextHandler>;
+
+export async function GET(request: NextRequest) {
+  if (!handler) {
+    handler = await createHandler();
   }
+  return handler(request);
 }
 
-const handler = await startServerAndCreateNextHandler(apolloServer);
-
-export { handler as GET, handler as POST };
+export async function POST(request: NextRequest) {
+  if (!handler) {
+    handler = await createHandler();
+  }
+  return handler(request);
+}
