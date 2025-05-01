@@ -6,7 +6,7 @@ import { useState, useRef, useEffect, ChangeEvent, useCallback } from 'react';
 import { useLazyQuery } from '@apollo/client/react/hooks'
 import GroupIcon from '@mui/icons-material/Group';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
-import { Box, Button, FormLabel, TextField, Card, CardContent, Typography } from '@mui/material';
+import { Box, Button, FormLabel, TextField, Card, CardContent, Typography, Link } from '@mui/material';
 import type { CustomNodeElementProps } from 'react-d3-tree';
 
 import { Section } from './components/layout/Section'
@@ -86,6 +86,7 @@ const queryPolicyHolderDetail = gql`
 
 export default function Home() {
   const [inputValue, setInputValue] = useState('')
+  const [searchingCode, setSearchingCode] = useState('')
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const treeContainerRef = useRef<HTMLDivElement>(null);
   const [fetchPolicyHolder, { loading, error, data }] = useLazyQuery(queryPolicyHolderDetail);
@@ -108,32 +109,65 @@ export default function Home() {
   const renderCustomNode = ({ nodeDatum }: CustomNodeElementProps) => {
     const cardWidth = dimensions.width * 0.08;
     const cardHeight = dimensions.height * 0.1;
+    const isSearchingNode = nodeDatum.attributes?.code === searchingCode;
     return (
-      <foreignObject width={cardWidth} height={cardHeight} x={`-${cardWidth/2}`} y={`-${cardHeight/2}`}>
-        <Card
-          sx={{
-            backgroundColor: nodeDatum.__rd3t.depth === 0 ? '#FFE082' : '#A5D6A7',
-            borderRadius: 2,
-            textAlign: 'center',
-          }}
-          variant='outlined'
-        >
-          <CardContent sx={{ padding: '8px' }}>
-            <Typography variant='caption'>{nodeDatum.attributes?.code}</Typography>
-            <Typography variant='subtitle2'>{nodeDatum.name}</Typography>
-          </CardContent>
-        </Card>
+      <foreignObject width={cardWidth} height={cardHeight} x={`-${cardWidth/2-20}`} y={`-${cardHeight/2}`} style={{ position: 'relative' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Card
+            sx={{
+              backgroundColor: isSearchingNode 
+                ? '#ffe082'
+                : nodeDatum.attributes?.introducer_code === searchingCode
+                  ? '#a5d6a7' : '#ededed',
+              borderRadius: 2,
+              textAlign: 'center',
+            }}
+            variant='outlined'
+          >
+            <CardContent sx={{ padding: '8px' }}>
+              <Link
+                component='button'
+                variant='body2'
+                onClick={() => handlePolicyholderCodeOnClick(nodeDatum.attributes?.code as string)}
+              >
+                {nodeDatum.attributes?.code}
+              </Link>
+              <Typography variant='subtitle2'>{nodeDatum.name}</Typography>
+            </CardContent>
+          </Card>
+          {isSearchingNode && nodeDatum.attributes?.introducer_code && (
+            <Link
+              component="button"
+              variant="body2"
+              onClick={handlePreNodeSearchOnClick}
+              style={{ marginLeft: 8, width: '30px' }}
+            >
+              上一階
+            </Link>
+          )}
+        </div>
       </foreignObject>
     )
   };
 
-  const handleOnChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+  const handleSearchInputOnChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value)
   }, [setInputValue])
 
-  const handleOnClick = useCallback(() => {
+  const handleSearchOnClick = useCallback(() => {
+    setSearchingCode(inputValue)
     fetchPolicyHolder({ variables: { code: inputValue } });
-  }, [fetchPolicyHolder, inputValue]);
+  }, [setSearchingCode, fetchPolicyHolder, inputValue]);
+
+  const handlePolicyholderCodeOnClick = useCallback((code: string) => {
+    setSearchingCode(code)
+    fetchPolicyHolder({ variables: { code } });
+  }, [setSearchingCode, fetchPolicyHolder]);
+
+  const handlePreNodeSearchOnClick = useCallback(() => {
+    setSearchingCode(data?.policyholder?.introducer_code)
+    fetchPolicyHolder({ variables: { code: data?.policyholder?.introducer_code } });
+  }, [setSearchingCode, fetchPolicyHolder, data]);
 
   return (
     <div className='items-center justify-items-center w-full'>
@@ -142,8 +176,8 @@ export default function Home() {
           <hr />
           <Box display='flex' alignItems='center' gap={2} mb={4} mt={2}>
             <FormLabel>保戶編號</FormLabel>
-            <TextField hiddenLabel variant='outlined' size='small' value={inputValue} onChange={handleOnChange} />
-            <Button variant='contained' onClick={handleOnClick}>查詢</Button>
+            <TextField hiddenLabel variant='outlined' size='small' value={inputValue} onChange={handleSearchInputOnChange} />
+            <Button variant='contained' onClick={handleSearchOnClick}>查詢</Button>
           </Box>
         </Section>
         <Section icon={<MenuOpenIcon />} title='關係圖'>
