@@ -150,24 +150,24 @@ export default function Home() {
     )
   };
 
-  const handleSearchInputOnChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+  const handleSearchInputOnChange = (e: ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value)
-  }, [setInputValue])
+  }
 
   const handleSearchOnClick = useCallback(() => {
     setSearchingCode(inputValue)
     fetchPolicyHolder({ variables: { code: inputValue } });
-  }, [setSearchingCode, fetchPolicyHolder, inputValue]);
+  }, [fetchPolicyHolder, inputValue]);
 
   const handlePolicyholderCodeOnClick = useCallback((code: string) => {
     setSearchingCode(code)
     fetchPolicyHolder({ variables: { code } });
-  }, [setSearchingCode, fetchPolicyHolder]);
+  }, [fetchPolicyHolder]);
 
   const handlePreNodeSearchOnClick = useCallback(() => {
     setSearchingCode(data?.policyholder?.introducer_code)
     fetchPolicyHolder({ variables: { code: data?.policyholder?.introducer_code } });
-  }, [setSearchingCode, fetchPolicyHolder, data]);
+  }, [fetchPolicyHolder, data]);
 
   return (
     <div className='items-center justify-items-center w-full'>
