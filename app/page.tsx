@@ -137,8 +137,8 @@ export default function Home() {
           </Card>
           {isSearchingNode && nodeDatum.attributes?.introducer_code && (
             <Link
-              component="button"
-              variant="body2"
+              component='button'
+              variant='body2'
               onClick={handlePreNodeSearchOnClick}
               style={{ marginLeft: 8, width: '30px' }}
             >
@@ -170,8 +170,8 @@ export default function Home() {
   }, [fetchPolicyHolder, data]);
 
   return (
-    <div className='items-center justify-items-center w-full'>
-      <div className='w-5/6'>
+    <Box display='flex' flexDirection='column' alignItems='center' justifyContent='center' width='100%'>
+      <Box width='83.333%'>
         <Section icon={<GroupIcon />} title='保戶關係查詢'>
           <hr />
           <Box display='flex' alignItems='center' gap={2} mb={4} mt={2}>
@@ -181,9 +181,9 @@ export default function Home() {
           </Box>
         </Section>
         <Section icon={<MenuOpenIcon />} title='關係圖'>
-          {loading && <p>Loading...</p>}
-          {error && <p>Error: {error.message}</p>}
-          <div ref={treeContainerRef} style={{ width: '100%', height: '100vh' }}>
+          {loading && <Typography>Loading...</Typography>}
+          {error && <Typography>Error: {error.message}</Typography>}
+          <Box ref={treeContainerRef} width='100%' height='100vh'>
             <Tree
               data={adaptToTree(data?.policyholder)}
               orientation='vertical'
@@ -194,9 +194,9 @@ export default function Home() {
               zoomable
               scaleExtent={{ min: 0.1, max: 1 }}
             />
-          </div>
+          </Box>
         </Section>
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 }
