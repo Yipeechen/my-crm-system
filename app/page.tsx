@@ -9,8 +9,8 @@ import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import { Box, Button, FormLabel, TextField, Card, CardContent, Typography, Link } from '@mui/material';
 import type { CustomNodeElementProps } from 'react-d3-tree';
 
-import { Section } from './components/layout/Section'
-import { adaptToTree } from './adapters/treeAdapter';
+import { Section } from '../components/layout/Section'
+import { adaptToTree } from '../adapters/treeAdapter';
 
 const Tree = dynamic(() => import('react-d3-tree').then((mod) => mod.Tree), {
   ssr: false,
