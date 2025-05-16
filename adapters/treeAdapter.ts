@@ -1,17 +1,5 @@
-type RawNode = {
-  code: string;
-  name: string;
-  registration_date: string;
-  introducer_code: string;
-  l?: RawNode[];
-  r?: RawNode[];
-};
-
-type AdaptedNode = {
-  name: string;
-  attributes: Omit<RawNode, 'name' | 'l' | 'r'>;
-  children: AdaptedNode[];
-};
+import { RawNode } from '../utils/types';
+import { AdaptedNode } from './treeAdapter.type';
 
 export const adaptToTree = (node: RawNode): AdaptedNode => {
   const children: AdaptedNode[] = [];
