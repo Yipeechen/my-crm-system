@@ -1,19 +1,13 @@
+import { RawNode } from "@/utils/types";
+
 const MAX_DEPTH = 3;
 
-type Node = {
-  code: string;
-  name: string;
-  registration_date: string;
-  introducer_code: string | null;
-  l?: Node[];
-  r?: Node[];
-}
 export default class SourceAPI {
 
   API_URL = process.env.API_URL as string;
   X_API_KEY = process.env.X_API_KEY as string;
 
-  async fetchNode(code: string): Promise<Node> {
+  async fetchNode(code: string): Promise<RawNode> {
     const uri = `${this.API_URL}/api/policyholders`
     const result = await fetch(`${uri}?code=${code}`, {
       method: 'GET',
@@ -25,7 +19,7 @@ export default class SourceAPI {
     return result;
   }
 
-  async getPolicyholderDetail(code: string, depth: number = 1): Promise<Node> {
+  async getPolicyholderDetail(code: string, depth: number = 1): Promise<RawNode> {
     const node = await this.fetchNode(code);
 
     if (depth >= MAX_DEPTH) return node;

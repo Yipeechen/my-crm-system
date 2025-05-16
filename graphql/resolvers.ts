@@ -1,6 +1,6 @@
 import { Resolvers } from '@apollo/client';
 
-import SourceAPI from '../graphql/dataSource/api'
+import SourceAPI from './dataSource/api'
 
 const sourceAPI = new SourceAPI()
 
